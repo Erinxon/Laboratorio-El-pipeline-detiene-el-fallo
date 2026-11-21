@@ -42,6 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Instalar dependencias de Node.js
+        run: npm ci --ignore-scripts
       - name: Preparar carpeta de informes
         run: mkdir -p reports
       - name: Analizar dependencias
@@ -56,12 +58,12 @@ jobs:
             -v "${{ github.workspace }}:/src" \
             -v "${{ github.workspace }}/reports:/report" \
             owasp/dependency-check:latest \
-            --scan /src --format HTML --out /report --failOnCVSS 7 \
+            --scan /src --format JSON --out /report --failOnCVSS 7 \
             --nvdApiKey "$NVD_API_KEY"
       - name: Publicar informe de Dependency-Check
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: informe-dependency-check
-          path: reports/dependency-check-report.html
+          path: reports/dependency-check-report.json
           if-no-files-found: ignore

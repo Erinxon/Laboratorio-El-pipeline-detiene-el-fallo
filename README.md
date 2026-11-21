@@ -37,7 +37,7 @@ docker run --rm -v "${PWD}:/repo" zricethezav/gitleaks:latest `
 
 docker run --rm -v "${PWD}:/src" -v "${PWD}\reports:/report" `
   owasp/dependency-check:latest `
-  --scan /src --format HTML --out /report --failOnCVSS 7 `
+  --scan /src --format JSON --out /report --failOnCVSS 7 `
   --nvdApiKey "$env:NVD_API_KEY"
 ```
 
@@ -45,7 +45,7 @@ Define `NVD_API_KEY` en la sesión de PowerShell antes de ejecutar ese comando.
 
 El informe de Gitleaks queda en
 `reports/gitleaks.json` y el de Dependency-Check en
-`reports/dependency-check-report.html`. La primera ejecución de
+`reports/dependency-check-report.json`. La primera ejecución de
 Dependency-Check puede tardar mientras descarga su base de vulnerabilidades.
 
 ## Pipeline
