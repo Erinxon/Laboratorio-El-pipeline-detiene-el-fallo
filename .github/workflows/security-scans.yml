@@ -45,7 +45,7 @@ jobs:
       - name: Instalar dependencias de Node.js
         run: npm ci --ignore-scripts
       - name: Preparar carpeta de informes
-        run: mkdir -p reports
+        run: mkdir -p reports && chmod 777 reports
       - name: Analizar dependencias
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
