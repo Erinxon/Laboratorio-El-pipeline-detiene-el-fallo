@@ -45,12 +45,19 @@ jobs:
       - name: Preparar carpeta de informes
         run: mkdir -p reports
       - name: Analizar dependencias
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
+          if [ -z "$NVD_API_KEY" ]; then
+            echo "::error::Configura NVD_API_KEY en Settings > Secrets and variables > Actions."
+            exit 1
+          fi
           docker run --rm \
             -v "${{ github.workspace }}:/src" \
             -v "${{ github.workspace }}/reports:/report" \
             owasp/dependency-check:latest \
-            --scan /src --format HTML --out /report --failOnCVSS 7
+            --scan /src --format HTML --out /report --failOnCVSS 7 \
+            --nvdApiKey "$NVD_API_KEY"
       - name: Publicar informe de Dependency-Check
         if: always()
         uses: actions/upload-artifact@v4

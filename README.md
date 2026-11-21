@@ -9,6 +9,10 @@ Para el workflow, crea un secreto de repositorio llamado `DATABASE_URL` en
 GitHub: **Settings → Secrets and variables → Actions**. Ese secreto se inyecta
 solo en la aplicación; no se guarda en el repositorio.
 
+Dependency-Check también requiere una clave API de NVD. Solicítala en
+<https://nvd.nist.gov/developers/request-an-api-key> y guárdala, en la misma
+sección de GitHub, con el nombre `NVD_API_KEY`.
+
 ## Requisitos
 
 - Node.js y npm
@@ -33,8 +37,11 @@ docker run --rm -v "${PWD}:/repo" zricethezav/gitleaks:latest `
 
 docker run --rm -v "${PWD}:/src" -v "${PWD}\reports:/report" `
   owasp/dependency-check:latest `
-  --scan /src --format HTML --out /report --failOnCVSS 7
+  --scan /src --format HTML --out /report --failOnCVSS 7 `
+  --nvdApiKey "$env:NVD_API_KEY"
 ```
+
+Define `NVD_API_KEY` en la sesión de PowerShell antes de ejecutar ese comando.
 
 El informe de Gitleaks queda en
 `reports/gitleaks.json` y el de Dependency-Check en
