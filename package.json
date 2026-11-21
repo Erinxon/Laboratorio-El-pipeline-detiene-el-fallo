@@ -1,0 +1,13 @@
+{
+  "name": "supply-chain-scanning-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Laboratorio defensivo de escaneo de secretos y dependencias",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "lodash": "4.18.1"
+  }
+}

@@ -1,0 +1,60 @@
+name: Análisis de seguridad
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Detección de secretos (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        id: checkout
+      - name: Preparar carpeta de informes
+        run: mkdir -p reports
+      - name: Buscar secretos
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/repo" \
+            zricethezav/gitleaks:latest \
+            dir /repo --report-format json --report-path /repo/reports/gitleaks.json
+      - name: Ejecutar la aplicación con el secreto de base de datos
+        if: always() && steps.checkout.outcome == 'success' && github.event_name == 'push'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          npm ci --ignore-scripts
+          npm start
+      - name: Publicar informe de Gitleaks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-gitleaks
+          path: reports/gitleaks.json
+          if-no-files-found: ignore
+
+  dependency-check:
+    name: Análisis de dependencias (OWASP Dependency-Check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar carpeta de informes
+        run: mkdir -p reports
+      - name: Analizar dependencias
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/src" \
+            -v "${{ github.workspace }}/reports:/report" \
+            owasp/dependency-check:latest \
+            --scan /src --format HTML --out /report --failOnCVSS 7
+      - name: Publicar informe de Dependency-Check
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-dependency-check
+          path: reports/dependency-check-report.html
+          if-no-files-found: ignore
